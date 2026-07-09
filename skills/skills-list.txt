@@ -2,6 +2,7 @@ apple
 autonomous-ai-agents
 computer-use
 creative
+crypto
 data-science
 devops
 diagramming
@@ -53,6 +54,7 @@ okx-wallet-portfolio
 productivity
 red-teaming
 research
+self-hosting
 smart-home
 social-media
 software-development
