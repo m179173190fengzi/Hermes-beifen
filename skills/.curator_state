@@ -1,0 +1,9 @@
+{
+  "last_report_path": "/home/wei/.hermes/logs/curator/20260707-223040",
+  "last_run_at": "2026-07-07T22:30:40.125382+00:00",
+  "last_run_duration_seconds": 216.593568,
+  "last_run_summary": "auto: no changes; llm: All consolidations complete. Here's the full report:\n\n---\n\n## Consolidation Summary\n\n### 5 clusters processed, 10 skills archived\n\n**Cluster 1: Multi-Platform Search** — Consolidated 3 skills into `multi-platform-search-cli`\n- `agent-reach`…\narchived 10 skill(s):\n  • agent-reach → multi-platform-search-cli\n  • crypto-market-data → gmgn-onchain-analysis\n  • freqtrade-install → crypto-trading-bot\n  • freqtrade-strategy → crypto-trading-bot\n  • freqtrade-strategy-dev → crypto-trading-bot\n  • gmgn-cli-setup → gmgn-onchain-analysis\n  • meme-coin-analysis → gmgn-onchain-analysis\n  • multi-channel-search → multi-platform-search-cli\n  • ubuntu-power-optimization → linux-power-optimization\n  • ssh-remote-access — pruned (stale)\nfull report: hermes curator status\nkeep an umbrella stable: hermes curator pin crypto-trading-bot",
+  "last_run_summary_shown_at": null,
+  "paused": false,
+  "run_count": 2
+}

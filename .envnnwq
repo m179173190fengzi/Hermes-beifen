@@ -1,0 +1,9 @@
+DEEPSEEK_API_KEY=sk-844eb90aa3314cd3805d585d44f2875d
+TELEGRAM_BOT_TOKEN=8875303013:AAEXl86VQkH3nZBfIfU57EkEvrczzqdghmQ
+TELEGRAM_ALLOWED_USERS=7706985861
+TELEGRAM_HOME_CHANNEL=7706985861
+FLClash proxy                                                                            
+     export HTTP_PROXY=http://127.0.0.1:7890                                                  
+     export HTTPS_PROXY=http://127.0.0.1:7890                                                 
+     export ALL_PROXY=socks5://127.0.0.1:7890
+

@@ -1,0 +1,308 @@
+{
+  "started_at": "2026-07-07T22:30:40.125382+00:00",
+  "duration_seconds": 216.59,
+  "model": "deepseek-v4-flash",
+  "provider": "deepseek",
+  "auto_transitions": {
+    "marked_stale": 0,
+    "archived": 0,
+    "reactivated": 0,
+    "checked": 21
+  },
+  "counts": {
+    "before": 21,
+    "after": 11,
+    "delta": -10,
+    "archived_this_run": 10,
+    "added_this_run": 0,
+    "consolidated_this_run": 9,
+    "pruned_this_run": 1,
+    "state_transitions": 0,
+    "cron_jobs_rewritten": 0,
+    "tool_calls_total": 47
+  },
+  "tool_call_counts": {
+    "skill_view": 30,
+    "terminal": 8,
+    "read_file": 4,
+    "patch": 5
+  },
+  "archived": [
+    "agent-reach",
+    "crypto-market-data",
+    "freqtrade-install",
+    "freqtrade-strategy",
+    "freqtrade-strategy-dev",
+    "gmgn-cli-setup",
+    "meme-coin-analysis",
+    "multi-channel-search",
+    "ssh-remote-access",
+    "ubuntu-power-optimization"
+  ],
+  "consolidated": [
+    {
+      "name": "agent-reach",
+      "into": "multi-platform-search-cli",
+      "source": "model",
+      "reason": "Near-duplicate — same Agent Reach CLI install/config as the umbrella, with additional per-component install and Twitter auth fallback notes"
+    },
+    {
+      "name": "crypto-market-data",
+      "into": "gmgn-onchain-analysis",
+      "source": "model",
+      "reason": "General market data (BTC/ETH price fetching) is complementary to GMGN's on-chain focus — blockchain.info/CoinGecko data sources and Chinese presentation format merged"
+    },
+    {
+      "name": "freqtrade-install",
+      "into": "crypto-trading-bot",
+      "source": "model",
+      "reason": "Narrow install-only skill that is a sub-workflow of the broader crypto trading bot umbrella — install details, manual FreqUI, OKX auth, and FreqUI webserver sections merged"
+    },
+    {
+      "name": "freqtrade-strategy",
+      "into": "crypto-trading-bot",
+      "source": "model",
+      "reason": "Strategy development is a core sub-domain of the crypto trading bot umbrella — workflow, indicator patterns, iteration optimization, and reference strategies merged"
+    },
+    {
+      "name": "freqtrade-strategy-dev",
+      "into": "crypto-trading-bot",
+      "source": "model",
+      "reason": "Near-duplicate of freqtrade-strategy with same scope — merged content recycled and combined in the Strategy Development section with user-specific corrections (看大做小, MA parameters, timeframe evaluation)"
+    },
+    {
+      "name": "gmgn-cli-setup",
+      "into": "gmgn-onchain-analysis",
+      "source": "model",
+      "reason": "Setup/config is a prerequisite sub-workflow of GMGN on-chain analysis — install guide, credential masking, DexScreener API, and cron monitoring patterns merged"
+    },
+    {
+      "name": "meme-coin-analysis",
+      "into": "gmgn-onchain-analysis",
+      "source": "model",
+      "reason": "Meme coin analysis methodology is a usage pattern on top of GMGN data — BSC phase detection, entry/exit logic, cross-chain mirroring, and KOL tracking tools merged"
+    },
+    {
+      "name": "multi-channel-search",
+      "into": "multi-platform-search-cli",
+      "source": "model",
+      "reason": "Near-duplicate — identical 14-channel search CLI setup, content merged as channel quick-reference table"
+    },
+    {
+      "name": "ubuntu-power-optimization",
+      "into": "linux-power-optimization",
+      "source": "model",
+      "reason": "Near-duplicate — same power optimization workflow (CPU governor, kernel params, service pruning, Wayland display), variant script and display verification reference preserved"
+    }
+  ],
+  "pruned": [
+    {
+      "name": "ssh-remote-access",
+      "source": "model",
+      "reason": "Truly stale — 0 activity/use/views since creation, never used, generic SSH setup content available in countless other sources with no unique experiential knowledge"
+    }
+  ],
+  "pruned_names": [
+    "ssh-remote-access"
+  ],
+  "added": [],
+  "state_transitions": [],
+  "cron_rewrites": {
+    "rewrites": [],
+    "jobs_updated": 0,
+    "jobs_scanned": 2
+  },
+  "llm_final": "All consolidations complete. Here's the full report:\n\n---\n\n## Consolidation Summary\n\n### 5 clusters processed, 10 skills archived\n\n**Cluster 1: Multi-Platform Search** — Consolidated 3 skills into `multi-platform-search-cli`\n- `agent-reach` → merged as labeled sub-section + `references/agent-reach-session.md`\n- `multi-channel-search` → merged as channel quick-reference table\n- Umbrella patched with agent-reach-specific setup notes (per-component install, desktop autostart, Twitter auth fallback)\n\n**Cluster 2: Linux Power Optimization** — Consolidated 2 skills into `linux-power-optimization`\n- `ubuntu-power-optimization` → near-identical variant, merged completely\n- Support files preserved: `scripts/ubuntu-setup-powersave.sh`, `references/display-verification.md`\n- Umbrella patched with \"Merged Skills\" note\n\n**Cluster 3: FreqTrade/Crypto Trading** — Consolidated 4 skills into `crypto-trading-bot`\n- `freqtrade-install` → merged as \"Installation Details\" (+ OKX API auth, FreqUI webserver sections)\n- `freqtrade-strategy` + `freqtrade-strategy-dev` → merged as \"Strategy Development\" (workflow, MA cluster/bearish alignment/smooth decline patterns, iterative optimization, timeframe sensitivity, pitfalls)\n- Support files moved: `templates/freqtrade-startup.sh`, 3 reference strategy docs (six-ma-strategy, six-ma-cluster-strategy, dual-ma-crossover)\n\n**Cluster 4: GMGN Ecosystem** — Consolidated 4 skills into `gmgn-onchain-analysis`\n- `gmgn-cli-setup` → merged as \"GMGN CLI Setup Guide\" (install, key gen, credential masking, DexScreener, cron monitoring)\n- `meme-coin-analysis` → merged as \"BSC Market Phase Detection\" + \"Cross-Chain Meme Analysis\" (entry/exit logic, KOL tracking)\n- `crypto-market-data` → merged as \"General Market Data\" (blockchain.info, CoinGecko, Chinese presentation format)\n- 8 reference files relocated (dexscreener-api-usage, credential-masking-workaround, cz-final-form-bull-pump-analysis, bsc-market-phase-analysis, data-sources, solana-meme-research, bsc-meme-trading)\n\n**Pruning**: `ssh-remote-access` — 0 activity/use/view since creation, generic SSH setup advice, no unique value\n\n### Remaining standalone skills (11) — left alone because they are already class-level umbrellas or don't share clusters:\n- `cron-state-persistence` — unique cross-cutting cron pattern, no siblings\n- `gateway-troubleshooting` — unique Hermes gateway diagnostics, no siblings\n- `hermes-analytics-reporting` — unique Hermes usage reporting, no siblings\n- `okx-onchainos-workflow` — unique OKX onchainOS setup, no siblings\n- `openwrt-bypass-router` — unique router setup, no siblings\n- `provider-config-boundaries` — unique Hermes config guardrails, no siblings\n- `ubuntu-chinese-input-setup` — unique desktop setup, no siblings\n- `gmgn-cooking`, `gmgn-market`, `gmgn-portfolio`, `gmgn-swap`, `gmgn-token`, `gmgn-track` — hub-installed (skipped per rule)\n- `v4-bearish-alignment-strategy` — hub-installed (skipped)\n- All `okx-*` skills — hub-installed (skipped)\n\n## Structured summary (required)\n\n```yaml\nconsolidations:\n  - from: agent-reach\n    into: multi-platform-search-cli\n    reason: Near-duplicate — same Agent Reach CLI install/config as the umbrella, with additional per-component install and Twitter auth fallback notes\n  - from: multi-channel-search\n    into: multi-platform-search-cli\n    reason: Near-duplicate — identical 14-channel search CLI setup, content merged as channel quick-reference table\n  - from: ubuntu-power-optimization\n    into: linux-power-optimization\n    reason: Near-duplicate — same power optimization workflow (CPU governor, kernel params, service pruning, Wayland display), variant script and display verification reference preserved\n  - from: freqtrade-install\n    into: crypto-trading-bot\n    reason: Narrow install-only skill that is a sub-workflow of the broader crypto trading bot umbrella — install details, manual FreqUI, OKX auth, and FreqUI webserver sections merged\n  - from: freqtrade-strategy\n    into: crypto-trading-bot\n    reason: Strategy development is a core sub-domain of the crypto trading bot umbrella — workflow, indicator patterns, iteration optimization, and reference strategies merged\n  - from: freqtrade-strategy-dev\n    into: crypto-trading-bot\n    reason: Near-duplicate of freqtrade-strategy with same scope — merged content recycled and combined in the Strategy Development section with user-specific corrections (看大做小, MA parameters, timeframe evaluation)\n  - from: gmgn-cli-setup\n    into: gmgn-onchain-analysis\n    reason: Setup/config is a prerequisite sub-workflow of GMGN on-chain analysis — install guide, credential masking, DexScreener API, and cron monitoring patterns merged\n  - from: meme-coin-analysis\n    into: gmgn-onchain-analysis\n    reason: Meme coin analysis methodology is a usage pattern on top of GMGN data — BSC phase detection, entry/exit logic, cross-chain mirroring, and KOL tracking tools merged\n  - from: crypto-market-data\n    into: gmgn-onchain-analysis\n    reason: General market data (BTC/ETH price fetching) is complementary to GMGN's on-chain focus — blockchain.info/CoinGecko data sources and Chinese presentation format merged\nprunings:\n  - name: ssh-remote-access\n    reason: Truly stale — 0 activity/use/views since creation, never used, generic SSH setup content available in countless other sources with no unique experiential knowledge\n```",
+  "llm_summary": "All consolidations complete. Here's the full report:\n\n---\n\n## Consolidation Summary\n\n### 5 clusters processed, 10 skills archived\n\n**Cluster 1: Multi-Platform Search** — Consolidated 3 skills into `multi-platform-search-cli`\n- `agent-reach`…",
+  "llm_error": null,
+  "tool_calls": [
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"crypto-market-data\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"meme-coin-analysis\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"multi-channel-search\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"multi-platform-search-cli\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"linux-power-optimization\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"ubuntu-power-optimization\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"ubuntu-chinese-input-setup\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"ssh-remote-access\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"openwrt-bypass-router\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"crypto-trading-bot\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"freqtrade-install\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"freqtrade-strategy\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"freqtrade-strategy-dev\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"gmgn-cli-setup\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"gmgn-onchain-analysis\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"okx-onchainos-workflow\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"agent-reach\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"cron-state-persistence\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"gateway-troubleshooting\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"hermes-analytics-reporting\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"provider-config-boundaries\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"ubuntu-power-optimization\", \"file_path\": \"references/display-verification.md\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"ubuntu-power-optimization\", \"file_path\": \"scripts/setup-powersave.sh\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"linux-power-optimization\", \"file_path\": \"scripts/setup-powersave.sh\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"name\": \"agent-reach\", \"file_path\": \"references/session-20260628.md\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"file_path\": \"references/okx-futures-config.md\", \"name\": \"crypto-trading-bot\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"file_path\": \"references/okx-futures-config.md\", \"name\": \"freqtrade-install\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"file_path\": \"references/six-ma-strategy.md\", \"name\": \"freqtrade-strategy\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"file_path\": \"references/six-ma-cluster-strategy.md\", \"name\": \"freqtrade-strategy-dev\"}"
+    },
+    {
+      "name": "skill_view",
+      "arguments": "{\"file_path\": \"templates/startup-script.sh\", \"name\": \"freqtrade-install\"}"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"mkdir -p ~/.hermes/skills/devops/linux-power-optimization/references && mkdir -p ~/.hermes/skills/.archive\"}"
+    },
+    {
+      "name": "read_file",
+      "arguments": "{\"path\": \"/home/wei/.hermes/skills/devops/linux-power-optimization/SKILL.md\"}"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"mv ~/.hermes/skills/devops/ubuntu-power-optimization/references/display-verification.md ~/.hermes/skills/devops/linux-power-optimization/references/display-verification.md && mv ~/.hermes/skills/devops/ubuntu-power-optimization/scripts/setup-powersave.sh ~/.hermes/skills/devops/linux-power-optimization/scripts/ubuntu-setup-powersave.sh && mv ~/.hermes/skills/devops/ubuntu-power-optimi…"
+    },
+    {
+      "name": "patch",
+      "arguments": "{\"mode\": \"replace\", \"path\": \"/home/wei/.hermes/skills/devops/linux-power-optimization/SKILL.md\", \"old_string\": \"## Pitfalls\\n\\n- **sudo 密码被工具拦截**：Hermes 工具链会阻止交互式 sudo 和 `sudo -S` 密码管道。先检查 `sudo -n echo ok` 能否直接用。如果 `/etc/sudoers.d/hermes-nopasswd` 已存在（内容 `wei ALL=(ALL) NOPASSWD: ALL`），则全程用 `sudo -n` 即可。如果不存在，让用户手动运行一次生成的一键脚本。\\n- **Wayland 息屏 ≠ DPMS 息屏**：Wayland 下没有 DPMS 扩展，`xset` 不可用。屏幕只变暗不灭屏的根因是…"
+    },
+    {
+      "name": "read_file",
+      "arguments": "{\"path\": \"/home/wei/.hermes/skills/social-media/multi-platform-search-cli/SKILL.md\"}"
+    },
+    {
+      "name": "patch",
+      "arguments": "{\"old_string\": \"| `heyibinance` | He Yi | Binance co-founder |\\n\\n## Important Notes\", \"new_string\": \"| `heyibinance` | He Yi | Binance co-founder |\\n\\n## Agent-Reach-Specific Setup Notes\\n\\nThe following details were absorbed from the separate `agent-reach` skill.\\n\\n### Per-Component Installation (if `--channels=all` fails)\\n\\n```bash\\n# GitHub CLI\\nsudo apt install gh\\n\\n# YouTube (yt-dlp)\\npip…"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"mkdir -p ~/.hermes/skills/social-media/multi-platform-search-cli/references && mv ~/.hermes/skills/research/agent-reach/references/session-20260628.md ~/.hermes/skills/social-media/multi-platform-search-cli/references/agent-reach-session.md && mv ~/.hermes/skills/research/agent-reach ~/.hermes/skills/.archive/agent-reach && mv ~/.hermes/skills/social-media/multi-channel-search ~/.herm…"
+    },
+    {
+      "name": "read_file",
+      "arguments": "{\"path\": \"/home/wei/.hermes/skills/devops/crypto-trading-bot/SKILL.md\"}"
+    },
+    {
+      "name": "patch",
+      "arguments": "{\"old_string\": \"## Quick Reference\\n\\n| Task | Command |\\n|------|---------|\\n| List exchanges | `freqtrade list-exchanges -c config.json` |\\n| Download data | `freqtrade download-data -t 5m --days 30 -c config.json` |\\n| Backtest | `freqtrade backtesting --strategy SampleStrategy -c config.json` |\\n| Start trade | `freqtrade trade -c config.json` |\\n| FreqUI | `freqtrade webserver -c config.json …"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"# Move files from freqtrade-install\\nmv ~/.hermes/skills/software-development/freqtrade-install/templates/startup-script.sh ~/.hermes/skills/devops/crypto-trading-bot/templates/freqtrade-startup.sh\\n\\n# Move files from freqtrade-strategy\\nmv ~/.hermes/skills/software-development/freqtrade-strategy/references/six-ma-strategy.md ~/.hermes/skills/devops/crypto-trading-bot/references/\\nmv…"
+    },
+    {
+      "name": "read_file",
+      "arguments": "{\"path\": \"/home/wei/.hermes/skills/trading/gmgn-onchain-analysis/SKILL.md\"}"
+    },
+    {
+      "name": "patch",
+      "arguments": "{\"new_string\": \"## Reference Files\\n\\n| File | Description |\\n|------|-------------|\\n| `references/cross-chain-mirroring.md` | Solana KOL/Ansem → BSC CZ 跨链模仿逻辑 — 用户教学笔记 |\\n| `references/conspiracy-pump-analysis.md` | CZ Final Form Bull 阴谋盘分析案例 — 检测方法+数据 |\\n\\n---\\n\\n## GMGN CLI Setup Guide (Absorbed from gmgn-cli-setup)\\n\\nThe `gmgn-cli-setup` skill has been merged here. Below is the full setup wo…"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"# Move files from gmgn-cli-setup\\nmv ~/.hermes/skills/devops/gmgn-cli-setup/references/dexscreener-api-usage.md ~/.hermes/skills/trading/gmgn-onchain-analysis/references/\\nmv ~/.hermes/skills/devops/gmgn-cli-setup/references/credential-masking-workaround.md ~/.hermes/skills/trading/gmgn-onchain-analysis/references/\\n\\n# Move files from meme-coin-analysis\\nmv ~/.hermes/skills/trading/m…"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"mv ~/.hermes/skills/devops/ssh-remote-access ~/.hermes/skills/.archive/ssh-remote-access\"}"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"echo \\\"=== Skills remaining ===\\\" && ls ~/.hermes/skills/*/ 2>/dev/null && echo \\\"\\\" && echo \\\"=== Archive ===\\\" && ls ~/.hermes/skills/.archive/\"}"
+    },
+    {
+      "name": "terminal",
+      "arguments": "{\"command\": \"echo \\\"=== multi-platform-search-cli ===\\\" && find ~/.hermes/skills/social-media/multi-platform-search-cli -type f && echo \\\"\\\" && echo \\\"=== linux-power-optimization ===\\\" && find ~/.hermes/skills/devops/linux-power-optimization -type f && echo \\\"\\\" && echo \\\"=== crypto-trading-bot ===\\\" && find ~/.hermes/skills/devops/crypto-trading-bot -type f && echo \\\"\\\" && echo \\\"=== gmgn-onchai…"
+    },
+    {
+      "name": "patch",
+      "arguments": "{\"path\": \"/home/wei/.hermes/skills/social-media/multi-platform-search-cli/SKILL.md\", \"old_string\": \"description: \\\"Install and configure multi-platform internet search/read CLI tools (Agent Reach, OpenCLI) across 14+ channels: Twitter/X, Reddit, GitHub, YouTube, Bilibili, Xiaohongshu, Xiaoyuzhou, RSS, V2EX, LinkedIn, Xueqiu, and semantic web search. Use when user wants to search or read from multi…"
+    }
+  ]
+}
