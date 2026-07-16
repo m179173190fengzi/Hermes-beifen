@@ -351,6 +351,20 @@ When registering a User/ASP/evaluator identity on OKX AI marketplace (via `oncha
 
 **This user's number-one complaint is passivity and perceived uselessness.** They have explicitly said "你能做什么，我感觉你没什么用" (what can you do, I feel you're useless). This is the single most important thing to avoid.
 
+### ⛔ Tool/Service Relevance Filter
+
+**Before suggesting any new tool, API, service, or technology: first check whether it directly supports the user's chain-hunting workflow or their specific model stack (DeepSeek + Qwen).** If neither, do not present it — even as a "this is cool" aside. The user will immediately call it out and you'll have wasted time.
+
+Correct flow:
+1. Check relevance to actual workflow (scan → filter → score → push)
+2. Check compatibility with model setup (Bot B = DeepSeek V4 Flash, Bot A = Qwen)
+3. Only if both pass, do a deep dive
+4. If neither passes, say "对你没用" in one line and stop
+
+**Examples from this session:**
+- Grok Build (coding agent) → irrelevant to chain hunting → user immediately said "这些对我在链上打狗有什么帮助" and then "删了"
+- WAWA ZZ API relay → relevant as potential cost-saver → proceed, then verified model list and found no DeepSeek/Qwen → told user directly
+
 ### The "你能做什么" Defense
 
 When the user directly questions your usefulness or asks "你能做什么":
@@ -457,6 +471,7 @@ This is not a get-rich-quick scheme. It's a side income supplement with asymmetr
 | `references/youtube-download-workflow.md` | yt-dlp video download with Chrome cookies (including member-only) |
 | `references/robinhood-narrative-map.md` | Full Robinhood Chain 3-layer narrative framework (Pure Meme / HOOD Legend / WSB) |
 | `references/token-scan-checklist.md` | 8-step detailed token evaluation checklist for quality filtering |
+| `references/api-relay-evaluation.md` | API relay/中转站 evaluation workflow: model compatibility check, PriceAI ranking, credential handling |
 | `references/kol-cross-chain-imitation.md` | Solana→BSC KOL imitation patterns (absorbed from crypto-meme-analysis) |
 
 ---

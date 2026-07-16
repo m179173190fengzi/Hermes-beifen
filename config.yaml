@@ -3,7 +3,10 @@ model:
   provider: deepseek
   base_url: https://api.deepseek.com/v1
   api_key: sk-236d700c82f64db6ae0d5e2f2769f0ef
-providers: {}
+providers:
+  wawa:
+    base_url: https://wawazz.xyz/v1
+    api_key: sk-1606cbdaec53d662fc1f5a481e92c288c598c005ba534759a032be51b2c09599
 fallback_providers: []
 credential_pool_strategies: {}
 toolsets:
@@ -115,23 +118,23 @@ bedrock:
     trace: disabled
 auxiliary:
   vision:
-    provider: auto
-    model: ''
+    provider: wawa
+    model: claude-sonnet-4-20250514
     base_url: ''
     api_key: ''
     timeout: 120
     extra_body: {}
     download_timeout: 30
   web_extract:
-    provider: auto
-    model: ''
+    provider: wawa
+    model: claude-sonnet-4-20250514
     base_url: ''
     api_key: ''
     timeout: 360
     extra_body: {}
   compression:
-    provider: auto
-    model: ''
+    provider: wawa
+    model: claude-sonnet-4-20250514
     base_url: ''
     api_key: ''
     timeout: 120
@@ -144,8 +147,8 @@ auxiliary:
     timeout: 30
     extra_body: {}
   approval:
-    provider: auto
-    model: ''
+    provider: wawa
+    model: claude-sonnet-4-20250514
     base_url: ''
     api_key: ''
     timeout: 30

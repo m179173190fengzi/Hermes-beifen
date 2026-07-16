@@ -89,6 +89,14 @@ Stored as `~/.hermes/cron/mc200k_monitor.json`:
 - On each run: compare addresses per chain independently
 - New tokens on either chain trigger a notification
 
+### no_agent Health Check Watchdog
+
+For **pure script-based health checks** that run without any LLM (no tokens consumed), see:
+
+➡ `references/no-agent-health-check-watchdog.md`
+
+Covers the pattern and script contract for monitoring API keys, tokens, and external service endpoints (TG token expiry, GMGN API health, etc.) via `no_agent=true` cron jobs. The script stays silent on success and alerts on failure.
+
 ### Generic File Monitor
 ```python
 # Checking for new/updated files

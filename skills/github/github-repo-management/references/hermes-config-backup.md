@@ -80,9 +80,24 @@ curl -s -H "Authorization: token $TOKEN" https://api.github.com/user
 ```
 
 Fix: generate new token at https://github.com/settings/tokens (scopes: `repo`), update `~/.hermes/.git-credentials`.
-
 ### Large Files Bloat the Repo
+
 The `.gitignore` above drops huge dirs (node/, bin/, backups/, state.db), keeping the repo < 20MB. If you accidentally committed them, purge with `git filter-branch` or start fresh with `--force`.
+
+### Multi-Machine Backup — `git pull --rebase` Required
+
+When `.hermes/` is a shared backup repo pushed from **multiple machines** (e.g., Bot A WSL + Bot B Linux), you MUST pull before push or get `! [rejected]`:
+
+```bash
+cd ~/.hermes
+git pull origin main --rebase   # apply remote changes first
+git push origin main
+```
+
+Key points:
+- **`--rebase` not `--merge`**: Keeps history linear for single-user backup. Merge commits are unnecessary noise.
+- **Submodule warnings**: If `skills/` contains `.git` submodules (e.g. `huashu-nuwa`), rebase emits `unable to rmdir` — harmless, ignore it.
+- **No double auto-push crons**: If both machines auto-push, they'll fight. Only one machine should auto-push; the other pulls manually or uses pull-before-push.
 
 ### git push --force on Remote with Existing History
 If the remote already has a different history, `--force` is needed but destroys remote history. Acceptable for single-user backup repos.
