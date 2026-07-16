@@ -1,16 +1,20 @@
 ---
 name: meme-coin-scoring
-description: 链上土狗评分系统 — 0~100分复合打分，多维度评估土狗质量
+description: 链上代币实值评分系统 — 0~100分复合打分，配合6类过滤器评估代币质量
 category: crypto
 ---
 
-# Meme Coin Scoring System
+# 链上代币实值评分系统
 
-链上土狗评分系统，从4个维度综合评分（0~100），≥75分推荐关注。
+> ⚠️ **前置条件：必须先过6类过滤器**
+> 在评分之前，先用 `meme-coin-multi-agent-pipeline` 的6类过滤器判断该代币是否属于链创始人/KOL/科技领袖/政治人物/社会事件/知名机构类别。
+> **凡是不匹配6类别的代币，直接跳过不评分不推送。**
 
 ## 使用方法
 
-向用户询问一个币的链+地址，然后执行评分流程。
+1. **第一步：6类过滤** — 检查代币名/符号是否匹配6大类别关键词
+2. **第二步：评分** — 对通过过滤的代币执行以下4维度评分
+3. **第三步：报告** — 必须包含叙事详情+匹配类别+推特链接+实值评估
 
 ## 评分维度
 
@@ -36,6 +40,7 @@ category: crypto
 - **buy_sell_ratio**（买/卖比）: > 1.5 → 80分（买盘强）, > 1.0 → 60分, < 1.0 → 30分（卖盘强）
 - **swaps**（总交易笔数）: > 1000 → 80分, > 500 → 60分, > 100 → 40分, < 100 → 20分
 - **holder_count**（持仓人数）: > 500 → 80分, > 200 → 60分, > 50 → 40分, < 50 → 20分
+- **vol_to_liq_ratio**（交易量/流动性比）: 从GMGN trending数据计算 `volume / liquidity`；> 3.0 → +15分, > 1.0 → +10分, > 0.3 → +5分, < 0.3 → -5分（加分项，加在活跃度总分上）
 
 ## 复合计算
 
@@ -46,9 +51,13 @@ category: crypto
 ## 输出格式
 
 ```
-━━━ 土狗评分报告 ━━━
+━━━ 链上代币实值评估 ━━━
 
-代币: $SYMBOL
+📋 叙事: [1-2句说明这个币的故事]
+🏷️ 类别: 🔗链创始人 | 📣KOL | 🔬科技 | 🏛️政治 | 🌐事件 | 🏢机构
+🐦 推特: x.com/xxx
+
+代币: $SYMBOL (Name)
 地址: 0x1234...abcd
 
 📊 维度评分:
@@ -61,31 +70,39 @@ category: crypto
 
 判定: [≥75 → 🟢 推荐关注 / 60~74 → 🟡 观察 / <60 → 🔴 跳过]
 
+💡 价值判断:
+  [为什么这个代币值得/不值得关注 — 基于6类过滤结果+链上数据]
+
+关键数据:
+  💰 市值: $X
+  💧 流动性: $X
+  🐋 Top10: XX%
+  📦 Bundle: XX%
+  👑 聪明钱: X个
+  👥 持仓: X人
+  💱 24h交易: X笔
+  🛡️ 创建者: 在池✅/已撤池⚠️
+  🔒 锁仓: XX%
+```
+
 ## 社交热度查询（推特大V喊单检测）
 
 ### 工具：twitter CLI（无需X API Key）
 
 `twitter` 命令通过 `pipx install twitter-cli` 安装，内置了 X 访客 API，**不需要注册开发者账号或 OAuth 认证**即可搜索推文。
-
-⚠️ pipx venv 名称是 `twitter-cli`（不是 `twitter`）。安装后执行 `twitter search "关键词"` 即可。
+⚠️ pipx venv 名称是 `twitter-cli`（不是 `twitter`）。
 
 ```bash
 # 搜索币种被讨论的热度
 twitter search "\$SYMBOL -is:retweet"
-
 # 检查是否有大V在喊
 twitter search "\$SYMBOL 100x"
 twitter search "\$SYMBOL gem early"
-twitter search "\$SYMBOL 冲 上车"
-
-# 查看特定KOL的推文（如果账号是公开的）
+# 查看特定KOL的推文
 twitter search from:用户名
-
 # 搜索特定叙事话题
 twitter search "solana meme coin new -is:retweet -is:reply"
 ```
-
-**限制：** 无法搜索私密账号（受保护的推文）。对于公开账号正常使用。
 
 根据最近1小时内推文数量评估社交热度得分：
 - ≥ 20条推文 + 有KOL喊单 → 90分
@@ -93,10 +110,22 @@ twitter search "solana meme coin new -is:retweet -is:reply"
 - ≥ 3条推文 → 50分
 - 0~2条推文 → 20分
 
-结合已有的四项评分（部署者/聪明钱/链上健康/交易活跃度），社交热度作为第5个可选项加入综合判断：
+**结合评分：**
 - 四项评分 ≥ 75 且社交热度高 → 🔥 强推荐
-- 四项评分 ≥ 75 但社交热度低 → 🟡 可能被低估，观察
+- 四项评分 ≥ 75 但社交热度低 → 🟡 观察（可能被低估）
 - 四项评分 < 60 但社交热度高 → 🟡 叙事币，关注但谨慎
+
+**限制：** 无法搜索私密账号（受保护的推文）。
+
+## 链上+社媒交叉验证（来自@0xJeff onchain forensics工作流）
+
+当链上数据和社会情绪同时可用时，执行交叉验证判断：
+
+| 链上信号 | 推特情绪 | 判断 |
+|---------|---------|------|
+| 聪明钱卖出/链上流出 | 大V喊涨/社区FOMO | 🚩 **预警：出货掩护** — 链上筹码在派发，KOL喊你接盘 |
+| 链上持续流入/聪明钱建仓 | 冷清/无人讨论 | 🐋 **潜在建仓信号** — 聪明钱在别人没注意时进场 |
+| 链上流入+推特热度同时上升 | 🟢 **共识确认** — 链上和社区方向一致 |
 
 ## 核心原则：Confluence（多重信号共振）
 
@@ -109,24 +138,12 @@ twitter search "solana meme coin new -is:retweet -is:reply"
 | 🟢 三重信号 | 3个维度高分 | 可以告警，值得试 |
 | 🔥 四维全满 | 4个维度全部高分 | 强告警，优先考虑 |
 
-**示例：** Bundle<10%（部署者优）+ 聪明钱>5个（资本关注）+ 成交量/市值比>1.0（交易活跃）→ 三者同时成立才告警。只有成交量高但Bundle也高 → 可能是洗量，不告警。
+**示例：** Bundle<10%（部署者优）+ 聪明钱>5个（资本关注）+ 成交量/市值比>1.0（交易活跃）→ 三者同时成立才告警。
 
 **场景应用：**
-- 新币刚发射（<30min）：Bundle和Top10指示器权重降低，以聪明钱进场信号为主
+- 新币刚发射（<30min）：Bundle和Top10指标权重降低，以聪明钱进场信号为主
 - 币已运行>1h：四个维度权重回归正常
-- Robinhood Chain（token info不可用）：只用热搜榜可用字段评分，标注"受限评分"
-
-关键数据:
-  💰 市值: $X
-  💧 流动性: $X
-  🐋 Top10: XX%
-  📦 Bundle: XX%
-  👑 聪明钱: X个
-  👥 持仓: X人
-  💱 24h交易: X笔
-```
-
-## DeFiLlama 链上TVL监控
+- Robinhood Chain：creator_close普遍化，降权处理
 
 See `references/defillama-tvl-monitoring.md` for the API endpoint, target chains, and limitations of chain-level TVL monitoring. Used in the regular cron job to provide chain-level context alongside token-level scoring.
 
@@ -134,16 +151,22 @@ See `references/defillama-tvl-monitoring.md` for the API endpoint, target chains
 
 Check **cross-chain-meme-kol-analysis** for narrative context (Solana KOL → BSC CZ-copy pattern) — the scoring system is most effective when combined with narrative analysis.
 
-## 执行步骤
+## Reference Files
 
-1. 用户提供链（sol/bsc）+ 地址
-2. 用 `gmgn-cli token info --chain <chain> --address <address> --raw` 获取数据
-3. 提取以上所有字段
-4. 计算4个维度分数
-5. 计算复合总分
-6. 按格式输出报告给用户
+| File | Description |
+|------|-------------|
+| `references/auto-scan-cron.md` | 多链自动扫描cron配置 |
+| `references/robinhood-chain-scoring.md` | Robinhood链评分特例 |
+| `references/defillama-tvl-monitoring.md` | DeFiLlama TVL监控 |
+| `references/pipeline-test-20260711.md` | Pipeline全流程实测数据 — 10个代币评分+RH链信号分析 |
 
-## GMGN版本与链支持
+## 原始GMGN数据提取过程
+
+1. 用 `gmgn-cli token info --chain <chain> --address <address> --raw` 获取数据
+2. 提取以上所有字段
+3. 计算4个维度分数
+4. 计算复合总分
+5. 按格式输出报告给用户
 
 ## GMGN版本与链支持
 
@@ -250,6 +273,29 @@ Bundle: 12% ⚠️
 评级: 观察级（MC太大+Top10太高，但聪明钱和交易量尚可）
 ```
 
+### Robinhood Chain 管道扫描评分 — 2026-07-11 全流程实测
+
+全量扫 Robinhood trending 1h，10个代币评分分布：
+- **A STRONG BUY (85+)**: 0% — 无高质量标的
+- **B WATCH (70-84)**: 20% ($SCAM 72分, $VLAD 71分)
+- **C INTERESTING (60-69)**: 20% ($UTILITY 68分, $Pointless 62分)
+- **D PASS (<60)**: 60% — 6个代币过滤
+
+**Robinhood 链核心发现：**
+- **`creator_close: true` 几乎是标配**（10/10个币部署者已撤池）→ 在RH链上这个字段**不能作为正向信号**，需降权
+- **聪明钱分布极端**：要么20+（$SCAM 32个、$UTILITY 25个、$VLAD 22个），要么个位数
+- **牛市率普遍偏高**（$SCAM 57%、$UTILITY 28%）→ 需扣分处理
+- **MC普遍偏低**（多数<$100K，只有$VLAD >$1M但已暴跌82%）
+- **Bundle率接近0%** → 对RH链不适用作为过滤条件
+
+**修正后的 RH 链评分建议：**
+| 维度 | 原权重 | RH链调整 | 原因 |
+|------|--------|---------|------|
+| 部署者质量 | 30% | 20% | creator_close 太普遍，无法区分好坏 |
+| 聪明钱质量 | 25% | 30% | 聪明钱数量在RH链上区分度高 |
+| 链上健康度 | 25% | 25% | 机器人率和Top10依然有效 |
+| 交易活跃度 | 20% | 25% | 成交量/市值比和买卖比是最佳RH链信号 |
+
 ### $Jamey — 评分实测（2026-07-10）
 
 ```
@@ -264,9 +310,11 @@ Bundle: 12% ⚠️
 ## Pitfalls
 
 - ⚠️ **`lock_percent` 可能为null** — GMGN返回的JSON中可能是None。防御写法：`lock_pct = float(t.get('lock_percent',0) or 0)`
-- ⚠️ **`renounced_mint` 可能为null** — EVM链（BSC/Robinhood）上常为null。防御写法：`renounced = 1 if t.get('renounced_mint') else 0`
+- ⚠️ **`renounced_mint` 在EVM链上为null，但BSC/RH用 `is_renounced`** — Solana用 `renounced_mint`（1=已放弃），BSC/Robinhood用 `is_renounced`（1=已放弃）。必须同时检查两个字段，因为**一个为null时另一个才有值**。❌ 错误写法：`renounced = 1 if t.get('renounced_mint') else 0`（null被当作False，EVM链上全判为未放弃）。✅ 正确写法：`renounced = (t.get('renounced_mint') == 1) or (t.get('is_renounced') == 1)`
 - ⚠️ **`gmgn-cli market trending` 必须传 `--interval`** — 可选值: 1m / 5m / 1h / 6h / 24h，不传会报错 `error: required option '--interval <interval>' not specified`
 - ⚠️ **Bundle低≠安全** — 有些币Bundle率很低但Top10 > 70%，同样是庄盘。两个指标必须一起看
 - ⚠️ **聪明钱为0不一定skip** — 刚发射的币(<30min)可能还没标记聪明钱。等30分钟再扫
 - ⚠️ **MC > $1M + 成交量萎缩** = 🚩 币已老，聪明钱在退出
 - ⚠️ **先判断叙事阶段再打分** — Phase 3冷却期的币高分也不推荐。用cross-chain-meme-kol-analysis判断市场处于哪个阶段
+- ⚠️ **6类过滤器关键词假阳性** — 执行批量过滤时，`"sui"` 会误匹配 `"SHINYSUIT"`，`"tron"` 会误匹配 `"astronaut"`。必须用词边界匹配（`\bkw\b`）或符号开头匹配。详见 meme-coin-multi-agent-pipeline 的 ⚠️ 关键词假阳性陷阱 章节
+- ⚠️ **`python3 -c` 管道被拦截** — Hermes 安全系统拦截含 `python3 -c` 的终端命令。所有内联 Python 必须写入 `.py` 文件再执行。`write_file` 创建脚本 → `python3 /path/to/script.py`

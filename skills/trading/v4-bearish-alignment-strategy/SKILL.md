@@ -71,6 +71,8 @@ tags: [freqtrade, trading, strategy, futures, okx, multi-timeframe]
 | `references/btc-reference-sample.md` | BTC 1m参考样本 |
 | `references/backtest_results.md` | 各版本回测数据 |
 | `references/session-corrections.md` | ✅ **必读！** 用户纠正记录 |
+| `references/atk-cli-integration.md` | ✅ OKX ATK CLI实时检测V4信号 |
+| `scripts/v4-check-signals.py` | ✅ 自包含策略脚本（skill内独立运行，不依赖外部文件） |
 
 **必读：** 每次加载此skill前先读 `references/session-corrections.md`。
 
@@ -86,3 +88,5 @@ tags: [freqtrade, trading, strategy, futures, okx, multi-timeframe]
 | 策略代码路径 | `~/ft_userdata/user_data/strategies/v4.py`，类名 `V4Strategy` |
 | 用户默认给BTC数据 | 用户说走势参考时默认是BTC，确认前不要自己查ETH |
 | 改参数前先确认 | 用户没说改参数的时候不要自作主张改 |
+| **ATK CLI下单用错模式** | 有 --demo 参数的是模拟盘，不加的是实盘。**实盘要重新OAuth授权**并勾选实盘权限。授权时选错模式要重新跑 `okx auth login --manual --site global` |
+| **合约张数计算** | BTC-USDT-SWAP每张=0.01 BTC。张数 = (保证金×杠杆) / (BTC价格×0.01)。市价单有限额，超限报错 51202，需要减张数重试 |

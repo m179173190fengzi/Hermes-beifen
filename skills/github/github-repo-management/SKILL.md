@@ -501,6 +501,14 @@ for g in json.load(sys.stdin):
     print(f\"  {g['id']}  {g['description'] or '(no desc)':40}  {files}\")"
 ```
 
+## 11. Hermes Config Auto-Backup
+
+For automatically pushing `~/.hermes/` (config, skills, memories, cron) to a private GitHub repo on a schedule, see:
+
+➡ `references/hermes-config-backup.md`
+
+Covers: `.hermes/`-specific `.gitignore`, credential-helper setup, cron scheduling, and the **token-expiry → silent timeout** pitfall (most common failure mode).
+
 ## Quick Reference Table
 
 | Action | gh | git + curl |

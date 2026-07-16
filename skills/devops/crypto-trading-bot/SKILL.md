@@ -18,6 +18,7 @@ linked_files:
   - templates/six-ma-cluster-strategy.py: 六均线密集交易系统
   - templates/low-time-crypto-approach.md: 碎片化时间用户打法指南（低时间投入+监控模式）
   - scripts/test-okx-connection.py: OKX API 凭证验证脚本
+  - references/okx-atk-guide.md: OKX Agent Trade Kit 安装/认证/CLI速查/合约规格
 description: Set up and configure automated cryptocurrency trading bots. Covers FreqTrade setup, OKX futures config, strategy authoring, backtesting, AND low-time-investment passive monitoring for users with limited screen time. Install guide with proxy workarounds for China/GFW.
 ---
 

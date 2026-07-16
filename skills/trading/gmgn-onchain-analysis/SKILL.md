@@ -1,9 +1,9 @@
 ---
 name: gmgn-onchain-analysis
-description: "GMGN API integration for Solana meme coin on-chain analysis — trending tokens, token research (price/SM/holders/security), smart money tracking, and wallet portfolio queries. For Chinese-speaking crypto day-traders on Solana."
-version: 1.0.0
+description: "GMGN API integration for multi-chain on-chain analysis (Solana, BSC, Robinhood, Base, ETH) — trending tokens, token research (price/SM/holders/security), smart money tracking, and wallet portfolio queries. For Chinese-speaking crypto day-traders."
+version: 1.2.0
 author: Hermes Agent
-tags: [gmgn, solana, meme-coin, on-chain, crypto, smart-money, degen]
+tags: [gmgn, solana, bsc, robinhood, base, meme-coin, on-chain, crypto, smart-money, degen]
 ---
 
 # GMGN On-Chain Analysis
@@ -124,9 +124,11 @@ When presenting data:
 |--------|---------|---------|---------|
 | `smart_degen_count` | ≥ 3 | 0 | 1–2 |
 | `rug_ratio` | < 0.1 | > 0.3 | 0.1–0.3 |
-| `creator_token_status` | `creator_close` (dev sold) | `creator_hold` | — |
+| `creator_token_status` | `creator_close` (dev sold) on Solana/BSC | `creator_hold` | — |
 | `top_10_holder_rate` | < 20% | > 50% | 20–50% |
 | `is_wash_trading` | `false` | `true` (skip) | — |
+
+**⚠️ 链特例**: 在 Robinhood 链上，`creator_close` ≈ **普遍状态**（90%+代币都这样），不能用做正向信号。
 
 ## Western Meme Coin Perspective
 
@@ -252,20 +254,35 @@ When showing trending data, use **Telegram rich message format**:
 \`CA: token_address_here\`
 ```
 
-### OpenRouter / Provider Red Flags
+### ⛔ ABSOLUTE RULE: DeepSeek Only, Never Other Providers
 
-**OpenRouter API keys** — This user tried an OpenRouter key and found it unreliable/scam. Do NOT suggest OpenRouter as a primary provider. The user's preferred setup is:
-- **Primary**: DeepSeek (direct API via `api.deepseek.com/v1`)
-- **Vision**: Google Gemini (auxiliary.vision)
-- If the user asks about OpenRouter, present data neutrally but note that previous experience was negative.
+**This user has ONE acceptable model provider: DeepSeek.** Full stop.
 
-**ZhipuAI/GLM/智谱** — COMPLETELY BANNED. Never mention in any context, even as a suggestion in a list of options. This user's system crashed because a zai/glm provider was set without an API key; they are furious about it.
+- **Primary**: DeepSeek (direct API via `api.deepseek.com/v1`, model `deepseek-v4-flash`)
+- **Vision**: Google Gemini (auxiliary.vision — pre-configured, already set up)
+- **DashScope/千问**: User explicitly deleted the key and said "以后不跑别的模型了". Never re-add.
+- **OpenRouter**: User tried it, found it unreliable/scam. Never suggest.
+- **ZhipuAI/GLM/智谱**: COMPLETELY BANNED. Never mention in ANY context — not as a suggestion, not as a comparison, not in a list of options. This user's system crashed because a zhipu provider was set without an API key; they are furious about it.
+- **Any other provider** (Claude, GPT, Grok, Gemini-as-main, etc.): Do NOT suggest, offer, or mention as alternatives.
+
+**Rule enforcement:**
+- Never ask "要不要试试别的模型"
+- Never list alternative providers in any response
+- Never suggest switching because of rate limits, cost, or quality
+- If a user asks "为什么不用XX", say "你之前说过只用DeepSeek，我就一直用这个"
+- The ONLY exception is if the user directly asks "帮我配一下XX" — then and only then, follow the exact instructions without commentary
 
 ### Multi-Chain Data
 
 When a user asks about tokens on different chains:
-- **Solana**: 100+ active daily tokens, fast pace, Western meme culture dominant
+- **Solana**: 100+ active daily tokens, fast pace, Western meme culture dominant. Signal interpretation per the table above applies normally.
 - **BSC**: ~20-40 active daily tokens, Chinese-named tokens dominant (哈基米, 龙虾, 哭哭马), SM counts can be high (200+) on established projects
+- **Robinhood**: ~10-20 active daily tokens. **Signal interpretation differs from Solana/BSC:**
+  - `creator_close: true` ≈ **universal** (90%+ tokens have dev dumped) → NOT a bullish signal on RH. Downgrade deployer quality weight from 30% → 20%
+  - `bundler_rate` ≈ **always near 0%** → not useful as a filter on RH
+  - `bot_degen_rate` ≈ **often 30-60%** → higher robot activity is normal on RH
+  - `smart_degen_count` → **best discriminator** on RH. 20+ = interesting, <5 = skip
+  - MC on RH typically <$100K for trending tokens; $1M+ usually means heavy selling already happened
 - Include chain label in every section header (e.g. `## 🔥 Solana 5m Trending` vs `## 🔥 BSC 24h Trending`)
 
 ### Cross-Chain Narrative Mirroring (跨链模仿逻辑) — CRITICAL INSIGHT
@@ -433,6 +450,14 @@ This is not a get-rich-quick scheme. It's a side income supplement with asymmetr
 | `references/data-limitations.md` | CME futures data limitation, Xiaomi BE3600 OpenWrt status |
 | `references/xurl-monitoring-setup.md` | X/Twitter monitoring setup with xurl CLI — install, OAuth, crypto search commands |
 | `references/car-android-adb.md` | Car Android head unit app installation — 欧尚X5 specific, USB host-to-host fix |
+| `references/angle-analysis-workflow.md` | "这是什么角度" narrative analysis — identifying KOL/social-layer context behind a pump |
+| `references/event-driven-narratives.md` | Non-KOL trigger analysis: corporate filings, exchange listings, regulatory news |
+| `references/market-maker-shadow-tracking.md` | Shadow wallet tracking for Wintermute, Amber Group, GSR, DWF Labs |
+| `references/youtube-crypto-search.md` | YouTube crypto content search via Playwright (metadata extraction) |
+| `references/youtube-download-workflow.md` | yt-dlp video download with Chrome cookies (including member-only) |
+| `references/robinhood-narrative-map.md` | Full Robinhood Chain 3-layer narrative framework (Pure Meme / HOOD Legend / WSB) |
+| `references/token-scan-checklist.md` | 8-step detailed token evaluation checklist for quality filtering |
+| `references/kol-cross-chain-imitation.md` | Solana→BSC KOL imitation patterns (absorbed from crypto-meme-analysis) |
 
 ---
 
@@ -609,3 +634,126 @@ Full workflow: `references/xurl-monitoring-setup.md`.
 After auth, set up a cron job via `cronjob action='create'` that periodically reads X and summarizes hot topics. See the reference for exact search queries and command patterns.
 
 For conspiracy pump detection and detailed kline analysis, see `references/conspiracy-pump-analysis.md` and `references/cz-final-form-bull-pump-analysis.md` (moved from absorbed skill).
+
+---
+
+## KOL Analysis & Event-Driven Narratives (Absorbed from cross-chain-meme-kol-analysis)
+
+The `cross-chain-meme-kol-analysis` skill has been merged into this umbrella. Below are the unique patterns that extend what's already covered above.
+
+### "这是什么角度" — The Angle Question Pattern
+
+When the user asks about a token with "是什么角度" (what's the angle), this is asking for the **NARRATIVE/STORY** behind the pump, NOT technical data. The most common blunder is answering with price/volume/metrics when they want cultural context.
+
+**Correct answer structure:**
+1. **Identify the KOL/narrative origin** — Which persona, meme, or event is this token referencing? (e.g., Ansem on Solana → CZ on BSC)
+2. **If cross-chain** — Note if it's a Solana narrative mirrored to BSC with a CZ-branded counterpart
+3. **Pump quality** — Brief assessment: organic or orchestrated?
+4. **What traders see in it** — Why people are buying this specific narrative
+
+**Full workflow:** `references/angle-analysis-workflow.md`
+
+### 4-Stage Conspiracy Pump Lifecycle (Enhanced)
+
+Every conspiracy pump follows this lifecycle. Stage 4 is the exception, not the rule.
+
+| Stage | Timing | Price Action | Volume Pattern | User Action |
+|:------|:-------|:-------------|:---------------|:------------|
+| **1. Pre-pump** | Days/hours before | Low & stable ($0.0001-0.0002 range) | $500-8K/candle, no anomalies | Watch only |
+| **2. The Pump** | 04:00-07:00 BJT | Vertical 1000-34000% in 1-2h | 100-1000x baseline, crescendo | DO NOT FOMO in |
+| **3. The Dump** | Peak + 15min to 2h | -30% to -90% from peak | Sell volume exceeds buy volume at peak | If bought, sell into strength |
+| **4. Aftermath** | Hours to days post-dump | Crash to near-zero OR recovery | Volume returns to baseline or grows | Watch for survivor patterns |
+
+**Survivability signals (Stage 4):** A conspiracy pump may survive if: (a) narrative strength — culturally sticky meme (e.g. CZ/BSC); (b) holder growth — holders keep entering post-dump; (c) liquidity trend — growing, not exiting; (d) price holds above pre-pump baseline.
+
+### Position Management Rules (User-Taught)
+
+The user's #1 rule: **NEVER average down on a meme coin. NEVER hold past -20%. These are NOT trend trades — they are narrative pumps.**
+
+| Scenario | Action |
+|:---------|:-------|
+| +30% on pump | Sell 50% |
+| +100% on pump | Sell remaining 50% |
+| -10% after entry | Tighten stop |
+| -20% from entry | ❌ **SELL. No exceptions.** |
+| Volume drops >80% from peak | Exit — nobody left to buy |
+
+**When NOT to add:**
+- You're already down >10% (that means you were wrong)
+- Volume is declining (narrative fading)
+- Top10 concentration is >50% on a fresh token
+- More than 6 hours since launch (the good entry passed)
+
+### Event-Driven Narratives
+
+Not all hot narratives come from KOLs. Some are triggered by **corporate or regulatory events**:
+
+| Trigger | Example | Chain Response |
+|:--------|:--------|:---------------|
+| Corporate branding | Robinhood files "Time To Do Crypto" trademark | Tokens named $HOOD appear on Solana/BSC |
+| Exchange listing | Binance/Coinbase lists a token | Copycats and ecosystem tokens pump |
+| Regulatory news | SEC approves/denies something | Narrative tokens around the event |
+| Celebrity tweet | Elon/Trump/Musk mentions crypto | Immediate token creation wave |
+
+**Detection workflow:** Check X searches for non-KOL triggers → narrative is fresh, no real tokens yet → token creation wave follows within hours → wait for 2nd-3rd wave where quality filtering matters.
+
+See `references/event-driven-narratives.md` for full detail.
+
+### Market Maker Shadow Wallet Tracking
+
+Market makers (Wintermute, Amber Group, GSR, DWF Labs) use shadow wallets (multi-address networks) to hide accumulation/distribution. GMGN can track known addresses, but shadow wallet discovery requires manual cross-referencing. Paid systems (~$800/yr) automate this; GMGN free version does not.
+
+**GMGN limitation:** `gmgn-cli track follow-wallet` is **read-only** — to add wallets to follow, use the GMGN website (gmgn.ai → search wallet → click "追踪").
+
+See `references/market-maker-shadow-tracking.md` for the full methodology.
+
+### YouTube Crypto Content
+
+For searching YouTube crypto tutorials and discussions: see `references/youtube-crypto-search.md` (metadata extraction via Playwright).
+For downloading YouTube videos: see `references/youtube-download-workflow.md` (yt-dlp with Chrome cookies).
+
+### BSC Sentiment Timing Model
+
+The BSC meme market moves through sentiment phases:
+
+| Phase | Sentiment | Buy/Sell Ratio | New Token Inflow | Action |
+|:------|:----------|:--------------:|:----------------:|:-------|
+| **🟢 Ignition** | Fresh FOMO | >1.5 | 3-5+ new tokens/hot in top 20 | Early entries on narrative leaders |
+| **🟡 Peak Frenzy** | Max hype | >2.0 | Many copycats, CZ narratives dominate | Hold/partial exit; no new entries |
+| **🔴 Cooldown** | Fatigue | ~1.0-1.3 | 0-1 new tokens in top 20, volume shrinking | Wait; CZ narratives retrace 50-70% |
+| **⚫ Capitulation** | Fear | <0.8 | All tokens red, zero new entries | Watch for next ignition signal |
+
+**Key insight:** BSC sentiment mirrors Solana's KOL cycle with a delay. Check Solana trending first, then map to BSC.
+
+---
+
+## Token Scoring & Robinhood Narrative (Absorbed from crypto-meme-analysis)
+
+The `crypto-meme-analysis` skill has been merged into this umbrella.
+
+### 0-100 Composite Scoring System
+
+Score each token across 4 dimensions:
+
+| Dimension | Weight | Data Source |
+|-----------|--------|-------------|
+| **Deployer Quality** | 30% | GMGN: Bundle rate, creator history, renounced mint |
+| **Smart Money Quality** | 25% | GMGN: smart_degen_count, renowned_count |
+| **On-Chain Health** | 25% | GMGN: Top10%, liquidity, lock status |
+| **Trading Activity** | 20% | GMGN: volume, buy/sell ratio, holder growth |
+
+**Scoring thresholds:**
+- 85-100: 🟢 HIGH CONFLUENCE — alert user
+- 70-84: 🟡 WATCH — note for next scan
+- 50-69: 🟠 OBSERVE — needs more data
+- 0-49: 🔴 SKIP — too risky
+
+**Scoring criteria detail:** See `references/token-scan-checklist.md` for the full 8-step evaluation checklist with per-criterion point values and weights.
+
+### Quick Assessment Workflow
+
+1. **Data Collection**: GMGN trending → DexScreener search → Twitter verification
+2. **Scoring**: Apply the 4-dimension composite score
+3. **Narrative Mapping**: For Robinhood Chain, use the 3-layer framework (see `references/robinhood-narrative-map.md`)
+4. **Cross-Chain Check**: For BSC tokens, first check the Solana KOL narrative being mirrored (see `references/kol-cross-chain-imitation.md`)
+5. **Trading Advice**: See position management rules above

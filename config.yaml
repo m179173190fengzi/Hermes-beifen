@@ -2,6 +2,7 @@ model:
   default: deepseek-v4-flash
   provider: deepseek
   base_url: https://api.deepseek.com/v1
+  api_key: sk-236d700c82f64db6ae0d5e2f2769f0ef
 providers: {}
 fallback_providers: []
 credential_pool_strategies: {}
@@ -455,3 +456,5 @@ paste_collapse_threshold: 5
 paste_collapse_threshold_fallback: 5
 paste_collapse_char_threshold: 2000
 _config_version: 24
+http_proxy: http://127.0.0.1:7890
+https_proxy: http://127.0.0.1:7890

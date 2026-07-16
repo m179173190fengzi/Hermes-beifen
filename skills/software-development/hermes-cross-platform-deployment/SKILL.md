@@ -1,6 +1,6 @@
 ---
 name: hermes-cross-platform-deployment
-description: Deploy and migrate Hermes Agent across Ubuntu/Linux and Windows machines. Covers fresh install, config transfer, env differences, and troubleshooting platform-specific pitfalls.
+description: Deploy and migrate Hermes Agent across Ubuntu/Linux, Windows, and WSL. Fresh install, config transfer, env differences, platform pitfalls.
 category: software-development
 ---
 
@@ -14,6 +14,84 @@ category: software-development
 
 ## Key Principle
 **Do NOT copy raw config.yaml between machines with different Hermes versions or OS.** Always let `hermes setup` generate a fresh config on the target machine, then migrate only the `.env` secrets.
+
+---
+
+## WSL Deployment (Ubuntu on Windows)
+
+WSL (Windows Subsystem for Linux) runs Ubuntu inside Windows. Hermes setup here is similar to native Ubuntu but with WSL-specific pitfalls.
+
+### Install Hermes on WSL
+```bash
+# 1. Update packages
+sudo apt update && sudo apt upgrade -y
+
+# 2. Install pipx (NOT pip3 — Ubuntu 24.04 has PEP 668 external-managed-environment guard)
+sudo apt install pipx -y
+pipx ensurepath
+source ~/.bashrc
+
+# 3. Install Hermes via pipx
+pipx install hermes-agent
+
+# 4. Verify
+hermes --version
+```
+
+⚠️ **CRITICAL: Do NOT use `pip3 install hermes-agent` on Ubuntu 24.04+.** The system Python is externally managed (PEP 668). Only `pipx` works.
+
+### Configure Telegram Bot Token on WSL
+
+**Do NOT use `hermes config set telegram.bot_token`** — it fails with `ValueError: Invalid environment variable name: 'TELEGRAM.BOT_TOKEN'` because the config command tries to write `.env` as `TELEGRAM.BOT_TOKEN` (dots not allowed in env var names).
+
+**Correct approach — two-step:**
+```bash
+# Step 1: Write token to .env
+echo 'TELEGRAM_BOT_TOKEN=887530...' >> ~/.hermes/.env
+
+# Step 2: Add bot_token to config.yaml (manual edit or sed)
+echo '  bot_token: "887530..."' >> ~/.hermes/config.yaml
+```
+
+Or better, run `hermes setup` and let it handle Telegram config through the wizard.
+
+### Proxy for Telegram Gateway on WSL
+WSL cannot reach Telegram API without proxy. If gateway shows `TimedOut`:
+
+**🔥 CRITICAL PITFALL: Use Windows host IP, NOT `127.0.0.1`**
+
+From WSL, `127.0.0.1` refers to the WSL VM, NOT the Windows host. The Windows host is at the WSL gateway IP:
+```bash
+# Find Windows host IP from within WSL:
+ip route | grep default | awk '{print $3}'
+# Typical: 172.28.0.1 (varies per WSL version)
+```
+
+Correct proxy setup:
+```bash
+# Replace 172.28.0.1 with IP from `ip route` above
+export HTTP_PROXY=http://172.28.0.1:7890
+export HTTPS_PROXY=http://172.28.0.1:7890
+hermes gateway run --replace
+```
+The proxy port (7890) matches the Windows host's proxy (FLClash/Clash). If the user's Win proxy is on a different port, adjust accordingly. **The old instruction using `127.0.0.1` will always fail on WSL** — do not use it.
+
+To make proxy persistent across WSL sessions:
+```bash
+echo 'export HTTP_PROXY=http://172.28.0.1:7890' >> ~/.bashrc
+echo 'export HTTPS_PROXY=http://172.28.0.1:7890' >> ~/.bashrc
+```
+
+### Provider config on WSL (DashScope/Qwen)
+
+If using DashScope API key with Chinese region account, set base_url to the domestic endpoint:
+```bash
+hermes config set model.base_url https://dashscope.aliyuncs.com/compatible-mode/v1
+```
+The default `dashscope` provider auto-selects `dashscope-intl.aliyuncs.com` which rejects Chinese-region keys with HTTP 401.
+
+### When user is on a different machine (WSL/Remote)
+**Never describe commands for the user to type.** Always construct the EXACT copy-paste-ready command and tell them to paste it. This is the most common source of user frustration in remote/WSL deployment.
 
 ---
 
@@ -106,6 +184,108 @@ For persistent background: `hermes gateway install` (creates systemd-like servic
 
 ---
 
+## Across-Machine Sync (GitHub Backup Repo)
+
+When running Hermes on multiple machines, skills and memory are **not shared** by default. The recommended sync method:
+
+### Backup Repo Workflow
+
+1. On the **source machine** (e.g. Ubuntu server), the `~/.hermes` directory is a git repo pushed to GitHub:
+   ```bash
+   # Source machine already set up:
+   cd ~/.hermes
+   git remote -v
+   # → origin  https://github.com/<user>/Hermes-beifen.git
+   ```
+
+2. On the **target machine** (e.g. Win11), clone the repo to get all skills:
+   ```bash
+   cd ~
+   git clone https://github.com/<user>/Hermes-beifen.git .hermes
+   ```
+
+3. **Do NOT copy config.yaml or .env** between machines — run `hermes setup` fresh on the target. Only copy:
+   - `skills/` directory — all custom skills
+   - `memories/` directory — persistent user/memory notes
+
+### Sync Considerations
+
+| Item | Sync? | Method |
+|:-----|:------|:-------|
+| `skills/` | ✅ Copy | Git clone or manual copy |
+| `memories/` | ✅ Copy | File copy (JSON files) |
+| `config.yaml` | ❌ Don't copy | Run `hermes setup` fresh |
+| `.env` | ❌ Don't copy | Re-enter secrets per machine |
+| `plugins/` | ⚠️ Selective | Platform-specific plugins should match the target's messaging setup |
+| `cron/` | ⚠️ Review | Cron jobs reference machine-specific paths — adjust per machine |
+| `scripts/` | ✅ Copy | Self-contained scripts are machine-agnostic |
+
+### Cron Backup Auto-Sync
+
+The source machine should push regularly via cron:
+```bash
+cd ~/.hermes && git add -A && git commit -m "auto backup $(date +%F_%H%M)" && git push
+```
+The target machine pulls when needed. This keeps skills/memory in sync without manual file transfer.
+
+## Post-Deployment: Infrastructure Health Monitoring
+
+After deploying Hermes, critical infrastructure can fail silently (TG token revoked, gateway crash, API key expiry). Set up no_agent watchdog scripts for proactive alerts.
+
+### Telegram Bot Token Watchdog
+
+The most common silent failure: the TG bot token is revoked/reset via @BotFather. The gateway hangs on `Connecting to Telegram (attempt 1/8)…` and all messages are lost.
+
+**Solution — periodic no_agent cron check:**
+
+Script at `~/.hermes/scripts/tg_token_check.sh`:
+```bash
+#!/bin/bash
+# Checks TG token validity via getMe API
+TOKEN=$(grep '^TELEGRAM_BOT_TOKEN='*** "$HOME/.hermes/.env" | cut -d= -f2-)
+RESULT=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 \
+  "https://api.telegram.org/bot${TOKEN}/getMe")
+if [ "$RESULT" = "200" ]; then
+  exit 0  # SILENT
+elif [ "$RESULT" = "401" ]; then
+  echo "🚨 TG Bot Token 已失效！HTTP 401 Unauthorized"
+  exit 1  # alert
+fi
+exit 0  # network error → silent (avoid false alarms)
+```
+
+Cron setup (no_agent mode — no LLM tokens consumed):
+```bash
+cronjob action=create \
+  name='TG Token 有效性检查' \
+  schedule='0 10,16,22 * * *' \
+  script='tg_token_check.sh' \
+  no_agent=true
+```
+
+**Behavior:**
+- ✅ Token valid → exits 0 → no output → no delivery → silent
+- 🚨 Token invalid (401) → non-zero exit + message → delivered alert
+- 🌐 Network flaky → exits 0 → silent (don't bother user with transient issues)
+
+### Extending the Watchdog Pattern
+
+The same no_agent pattern can monitor:
+- **Gateway health**: Check `systemctl --user is-active hermes-gateway`
+- **API key validity**: Ping the provider API endpoint
+- **Disk space**: Alert on high usage
+- **Cron job health**: Verify last run was successful via `cronjob action=list`
+
+### Watchdog Requirements
+
+| Element | Detail |
+|:--------|:-------|
+| Script location | `~/.hermes/scripts/<name>.sh` (use just the filename in cron) |
+| Success behavior | Exit 0, produce no stdout → [SILENT] |
+| Failure behavior | Non-zero exit + stdout message → delivered as alert |
+| Transient tolerance | Network errors should exit 0 — only alert on definitive failures |
+| Cron mode | `no_agent=true` — pure script, zero LLM cost |
+
 ## Dual-Bot Instance (Same Account, Two Machines)
 
 You can run two Hermes instances on different machines, each with a different Telegram bot, sharing the same DeepSeek API key:
@@ -171,6 +351,25 @@ See the exact script at `references/telegram-setup-troubleshooting.md`.
 del C:\\...\\config.yaml
 hermes setup
 ```
+
+### 🔴 WSL proxy IP: NOT `127.0.0.1`
+
+From WSL, `127.0.0.1` refers to the WSL VM, NOT the Windows host. Always use the WSL gateway IP:
+```bash
+ip route | grep default | awk '{print $3}'   # e.g. 172.28.0.1
+```
+Proxy setup with wrong IP causes persistent `TimedOut` on Telegram connect.
+
+### 🔴 `hermes config get` vs `hermes config show` — version-dependent
+Newer Hermes versions (v33+) support `hermes config get <key>` to read a single value. **Older versions (pre-v33) reject `get`** with `invalid choice: 'get'` — only `hermes config show` works. When on Windows, never assume `hermes config get` exists:
+```powershell
+# Works everywhere:
+hermes config show     # full dump
+
+# New only — old will fail:
+hermes config get model.provider    # → error on Win
+```
+Workaround: parse `hermes config show` output or read config.yaml directly.
 
 ### 🔴 Config path: `%APPDATA%` vs `%USERPROFILE%`
 Hermes v33+ on Windows stores config at `%APPDATA%\\hermes\\` (usually `C:\\Users\\<user>\\AppData\\Local\\hermes\\`). The old path at `%USERPROFILE%\\.hermes\\` is IGNORED. When troubleshooting "No messaging platforms enabled":

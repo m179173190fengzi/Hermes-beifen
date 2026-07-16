@@ -13,7 +13,7 @@ trigger: 用户要求扫描 Robinhood Chain 新币
 
 ### 第二步：实时扫描，关注新出现的对
 - 年龄 < 30 分钟
-- 用 `gmgn-cli market trending --chain robinhood --limit 20 --raw` 获取热搜数据
+- 用 `gmgn-cli market trending --chain robinhood --interval 1h --limit 20 --raw` 获取热搜数据（⚠️ `--interval` 必传，可选值：1m/5m/1h/6h/24h）
 - 用浏览器打开 DexScreener Robinhood 页面获取最新交易对
 
 ### 第三步：快速筛选
