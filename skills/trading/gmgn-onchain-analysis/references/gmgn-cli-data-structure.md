@@ -79,3 +79,44 @@ Solana: `Pump.fun`, `letsbonk`, `moonshot_app`, `meteora`
 BSC: `fourmeme`, `openfour`, `flap`, `goplus_creator`
 Base: `clanker`, `flaunch`, `zora`
 ETH: `trench`, `clanker`, `klik`, `livo`, `pool_uniswap_v2`
+
+---
+
+## ⚠️ Hot-Searches vs Trending: 两种不同的数据结构
+
+`gmgn-cli market hot-searches --raw` 的响应结构 **与 trending 完全不同**。这是最常见的解析错误来源。
+
+| 命令 | 顶层结构 | Token 数组位置 | 解析路径 |
+|------|----------|---------------|----------|
+| `market trending --raw` | `{"code":0,"data":{"rank":[...]}}` | `data.rank` | `data['data']['rank']` |
+| `market hot-searches --raw` | `[{"chain":"sol","tokens":[...]}]` | 顶层 list 的每个元素的 `tokens` 字段 | 直接遍历顶层 list |
+
+### Hot-Searches 完整解析示例
+
+```python
+import json
+
+with open("/tmp/sol_hot.json") as f:
+    data = json.load(f)  # data 是一个 list
+
+for block in data:
+    chain = block["chain"]
+    interval = block["interval"]
+    tokens = block["tokens"]  # RankItem 数组
+    for token in tokens:
+        print(
+            token["rank"],
+            token["symbol"],
+            token["market_cap"],
+            token.get("visiting_count", 0)  # 热度的核心字段
+        )
+```
+
+### Hot-Searches 特有字段
+
+| 字段 | 说明 |
+|------|------|
+| `visiting_count` | 搜索/访问热度（排名依据，不像 `volume` 那样是交易量） |
+| `rank` | 该 chain+interval 组内的排名（1-based） |
+
+其余字段（`symbol`, `address`, `market_cap`, `volume`, `liquidity`, `smart_degen_count` 等）与 trending 的 `RankItem` 完全一致。

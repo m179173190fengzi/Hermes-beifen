@@ -1,6 +1,6 @@
 ---
 name: v4-bearish-alignment-strategy
-description: "V4 交易策略 — 6均线(SMA20/60/120+EMA20/60/120) + 看大做小多周期搜索，适用于1m-4h任意周期"
+description: "V4 交易策略 — 6均线(SMA20/60/120+EMA20/60/120) + 看大做小。⚠️ 4H最优，1m-15m短周期已验证亏损，勿用于日线/周线回测"
 version: 8.0.0
 author: Hermes Agent + CryptoFengzi
 tags: [freqtrade, trading, strategy, futures, okx, multi-timeframe]

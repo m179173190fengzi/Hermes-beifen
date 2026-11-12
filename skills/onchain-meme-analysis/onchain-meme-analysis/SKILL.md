@@ -116,14 +116,59 @@ description: 全链打狗数据分析。整合GMGN + DexScreener + Twitter + DeF
    - Blockscout查持仓分布
    - 合约安全检查
 
-### 模式D：链市纵观
+### 模式D：链市纵观（定时合成日报）
+
+用于定时任务，输出简报。**用户钦定的"每日Alpha合成简报"格式**（2026-07-31两次改版确认：①加回完整5板块 ②新增新币监控 ③排版简明每条≤3行，不要擅自加回长格式）：
 
 ```
-用于定时任务，输出简报
-1. 📊 链上TVL概览（DeFiLlama）
-2. 🔥 DexScreener交易量TOP5（Solana/BSC/Robinhood）
-3. 💬 Twitter热点/叙事
-4. 🎯 机会推荐
+━━━ 📡 每日Alpha合成简报 ━━━
+⏰ {日期时间}
+
+━━━ 💰 三链TVL ━━━
+Sol: $XB(±X%) | BSC: $YB(±X%) | RH: $ZB(±X%)
+📊 [一句话结论]
+
+━━━ 🔥 优质标的 ━━━
+#1 $SYM (CHAIN) | MC $X | 评分XX/75 | 6h ±X%
+📋 [叙事1句] | 类别:XX
+👥 持币X 聪明钱X | 💡 [价值1句]
+
+━━━ 🆕 新币监控(1D内 MC≥$1M) ━━━
+#1 $SYM (CHAIN) | MC $X | 高点 $Y | 6h ±X%
+📋 [叙事1句]
+👥 持币X 聪明钱X | ⚠️ [风险1句] | 💡 [价值1句]
+
+━━━ 🧠 交叉验证 & Alpha ━━━
+🚀 [核心叙事/热点簇 1-2句]
+🔗 [跨链镜像检测结果 1-2句]
+🚩 [风险预警 1-2句]
+🎯 [建议关注方向 2-4条，每条一行]
+```
+
+**新币监控筛选标准（2026-07-31用户确认）**：部署时间1D内 + MC稳定在$1M以上（不是瞬时冲高，看MC历史最高值vs当前值判断是否站稳），标注Rug/貔貅风险（bundle率、creator撤池、锁定情况）。
+
+**流程**：扫Sol/BSC/RH三链 trending 6h → 6类过滤器（链创始人/KOL/政治/科技/社会/机构）→ 加分制评分≤75分，≥70推/<60过滤（RH链特例：creator_close不加减分）→ 跨链叙事交叉验证 → 新币监控（1D内+MC≥$1M）→ TVL资金流（`python3 /home/wei/.hermes/scripts/tvl_monitor.py`，勿用/tmp路径——重启会丢）。
+
+**风控规则**：不推MC<$10K；不推Bundle>30%；Top10>70%标注高度控盘；三链都无≥70分+无热点 → 回复 [SILENT] 不推送。
+
+**📰 公众号排版交付（2026-07-31用户钦定）**：定时链上日报最终产物用 `gzh-design` 技能排成公众号HTML，不再发纯文本长报。流程：生成Markdown简报 → 加载gzh-design（题材=数据复盘/行情报告，主题用「石墨极简风」或「橄榄手记」）→ 读theme-index + 对应主题组件库 + common-components → 装配HTML → 跑 `python3 ~/.hermes/skills/gzh-design/scripts/validate_gzh_html.py <html>` 清零ERROR和半角标点WARNING → 用 `scripts/wrap_preview.py` 生成带复制按钮的预览页 → 最终响应附HTML文件路径（MEDIA:发送预览页）。gzh-design已装于 `~/.hermes/skills/gzh-design/`（6主题+自定义主题生成器）。
+
+**🔴 程序化生成HTML的坑（Python拼HTML时踩过，validate脚本会报WARNING）**：
+- 用辅助函数做关键词下划线标记时，简单 `text.replace(keyword, '<span style=...>...</span>')` 会让**外层文本失去 `<span leaf="">` 包裹**，粘贴到公众号样式整片丢失。
+- 正确模式：**按关键词拆分文本，交替拼接**——每段普通文本包 `<span leaf="">text</span>`，关键词包 `<span style="border-bottom:2px solid #52525B;font-weight:600;color:#27272A;"><span leaf="">kw</span></span>`（leaf嵌套在样式span里）。
+- 每个装饰性空元素（细线/水印编号装饰/END短线）内部必须放 `<span leaf=""><br></span>` 占位，否则微信剥样式。
+- 生成后**必跑** `validate_gzh_html.py`，ERROR必须清零，半角标点WARNING也要修到0（中文正文用全角标点，代码/URL内保持半角）。
+- 文件名规范：`{日期}_链上日报_排版.html`（干净正文，纯section片段不带DOCTYPE）+ `{...}_预览.html`（wrap_preview.py产物）。
+
+**⚠️ cron异步跑全套慢**：7个技能加载+排版全流程2-3分钟，用户会催。方案：①纯文本简报先出（快），HTML排版文件随后补发；②或接受延迟。用户已确认排版交付为最终形态，但每次手动验收时直接用execute_code跑数据+拼HTML（15秒出数据+校验），别等cron。
+
+**⚠️ 代理坑**：`gmgn-cli` 直连会 ECONNREFUSED，必须在带代理环境变量下运行（`HTTPS_PROXY=http://127.0.0.1:7890` 等）。execute_code 的 subprocess 不继承 shell 代理，需显式传 env。`curl api.llama.fi` 同样需要代理。
+
+**数据命令**：
+```bash
+gmgn-cli market trending --chain sol --interval 6h --limit 30 --raw
+gmgn-cli market trending --chain bsc --interval 6h --limit 30 --raw
+gmgn-cli market trending --chain robinhood --interval 6h --limit 30 --raw
 ```
 
 ## 相关技能

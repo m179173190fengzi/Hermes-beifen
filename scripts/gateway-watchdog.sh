@@ -1,55 +1,62 @@
 #!/bin/bash
-# Gateway 通道健康检查脚本
-# 每5分钟由 cron 调度，检查 Telegram gateway 是否正常运行
-# 正常时静默退出（无输出 = 不通知），异常时输出报告
+# Gateway + Telegram 通道看门狗（每 5 分钟，no_agent）
+# 正常：完全静默（无输出 = 不推送）
+# 异常：自动重启 + 输出报告
+#
+# 为什么需要它：2026-10-19 00:31 Telegram 适配器在 Pool timeout 后彻底死亡，
+# 日志写了 "Restarting gateway" 但进程没真重启，systemd 仍显示 active，
+# bot 静默失联 9 小时。只查 systemctl is-active 抓不到这种"活着但不干活"的状态。
 
-set -e
+set -u
 
 HERMES_HOME="${HERMES_HOME:-$HOME/.hermes}"
-LOG_DIR="$HERMES_HOME/logs"
-WATCHDOG_LOG="$LOG_DIR/gateway-watchdog.log"
-TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+TS=$(date '+%m-%d %H:%M')
+OUT=""
 
-# 确保日志目录存在
-mkdir -p "$LOG_DIR"
+_service_active() { systemctl --user is-active hermes-gateway 2>/dev/null | grep -q '^active$'; }
 
-# 1. 检查 systemd 服务状态
-SERVICE_STATUS=$(systemctl --user is-active hermes-gateway 2>/dev/null || echo "unknown")
-
-if [ "$SERVICE_STATUS" != "active" ]; then
-    echo "[$TIMESTAMP] ⚠️ Gateway 服务状态: $SERVICE_STATUS，尝试重启..."
-
-    # 尝试重启
+_restart() {
     systemctl --user restart hermes-gateway 2>/dev/null || true
-    sleep 5
-
-    # 再次检查
-    RETRY_STATUS=$(systemctl --user is-active hermes-gateway 2>/dev/null || echo "unknown")
-    if [ "$RETRY_STATUS" = "active" ]; then
-        echo "[$TIMESTAMP] ✅ Gateway 重启成功！"
-    else
-        echo "[$TIMESTAMP] ❌ Gateway 重启失败，状态: $RETRY_STATUS"
-        echo "[$TIMESTAMP] 📋 最近日志:"
-        journalctl --user -u hermes-gateway --no-pager -n 10 2>/dev/null || echo "无法获取日志"
+    sleep 8
+    if ! _service_active; then
+        # 兜底：kill -TERM 让 systemd 自己拉起
+        PID=$(systemctl --user show -p MainPID --value hermes-gateway 2>/dev/null)
+        [ -n "$PID" ] && [ "$PID" != "0" ] && kill -TERM "$PID" 2>/dev/null
+        sleep 8
     fi
+}
+
+# ── 1. 服务挂了 ────────────────────────────────────────────
+if ! _service_active; then
+    OUT="[$TS] ⚠️ Gateway 服务不在运行，已尝试重启"
+    _restart
+    if _service_active; then
+        OUT="$OUT → ✅ 成功"
+    else
+        OUT="$OUT → ❌ 失败，需手动处理：systemctl --user restart hermes-gateway"
+    fi
+    echo "$OUT"
     exit 0
 fi
 
-# 2. 检查最近日志中是否有严重错误（只关注最近10分钟）
-# 注意：WARNING 级别（如代理重连）在网络环境下属正常，不报警
-if [ -f "$LOG_DIR/gateway.log" ]; then
-    TEN_MIN_AGO=$(date -d '10 minutes ago' '+%Y-%m-%d %H:%M')
-    RECENT_ERRORS=$(grep -i "ERROR\|CRITICAL\|Traceback" \
-        "$LOG_DIR/gateway.log" 2>/dev/null | \
-        awk -v since="$TEN_MIN_AGO" '$0 ~ since || ($1" "$2) >= since' | \
-        tail -5)
+# ── 2. 进程活着但 Telegram 适配器已死（核心场景）──────────
+# 只认"致命"标记，普通代理重连 WARNING 不报警
+DEAD_MARK=$(journalctl --user -u hermes-gateway --since "20 min ago" --no-pager 2>/dev/null \
+    | grep -iE "could not reconnect after|Fatal .*adapter error|polling could not reconnect" \
+    | tail -2)
 
-    if [ -n "$RECENT_ERRORS" ]; then
-        echo "[$TIMESTAMP] ⚠️ Gateway 运行中，但最近10分钟内有异常:"
-        echo "$RECENT_ERRORS"
-        exit 0
+if [ -n "$DEAD_MARK" ]; then
+    OUT="[$TS] ⚠️ Telegram 适配器掉线（进程仍在，但收不到消息），已自动重启"
+    _restart
+    if _service_active; then
+        OUT="$OUT → ✅ 已重启，PID $(systemctl --user show -p MainPID --value hermes-gateway)"
+    else
+        OUT="$OUT → ❌ 重启失败"
     fi
+    echo "$OUT"
+    echo "证据: $(echo "$DEAD_MARK" | tail -1 | cut -c1-160)"
+    exit 0
 fi
 
-# 3. 一切正常 — 静默退出
+# ── 3. 一切正常 ────────────────────────────────────────────
 exit 0

@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "installed": {
+    "youtube-full": {
+      "source": "skills.sh",
+      "identifier": "skills-sh/ZeroPointRepo/youtube-skills/skills/youtube-full",
+      "trust_level": "community",
+      "scan_verdict": "safe",
+      "content_hash": "sha256:6ed914ce85db1d60",
+      "install_path": "youtube-full",
+      "files": [
+        "SKILL.md",
+        "references/auth-setup.md"
+      ],
+      "metadata": {
+        "detail_url": "https://skills.sh/ZeroPointRepo/youtube-skills/skills/youtube-full",
+        "repo_url": "https://github.com/ZeroPointRepo/youtube-skills"
+      },
+      "installed_at": "2026-07-31T05:41:00.993240+00:00",
+      "updated_at": "2026-07-31T05:41:00.993286+00:00"
+    },
+    "songsee": {
+      "source": "official",
+      "identifier": "official/media/songsee",
+      "trust_level": "builtin",
+      "scan_verdict": "backfilled",
+      "content_hash": "sha256:2cb6f1b3d64e8141",
+      "install_path": "media/songsee",
+      "files": [
+        "SKILL.md"
+      ],
+      "metadata": {
+        "backfilled_from": "optional-skills"
+      },
+      "installed_at": "2026-11-06T00:11:27.906792+00:00",
+      "updated_at": "2026-11-06T00:11:27.906792+00:00"
+    },
+    "llama-cpp": {
+      "source": "official",
+      "identifier": "official/mlops/inference/llama-cpp",
+      "trust_level": "builtin",
+      "scan_verdict": "backfilled",
+      "content_hash": "sha256:43a4ec8fb07acce8",
+      "install_path": "mlops/inference/llama-cpp",
+      "files": [
+        "SKILL.md",
+        "references/advanced-usage.md",
+        "references/hub-discovery.md",
+        "references/optimization.md",
+        "references/quantization.md",
+        "references/server.md",
+        "references/troubleshooting.md"
+      ],
+      "metadata": {
+        "backfilled_from": "optional-skills"
+      },
+      "installed_at": "2026-11-06T00:11:28.140858+00:00",
+      "updated_at": "2026-11-06T00:11:28.140858+00:00"
+    },
+    "dspy": {
+      "source": "official",
+      "identifier": "official/mlops/research/dspy",
+      "trust_level": "builtin",
+      "scan_verdict": "backfilled",
+      "content_hash": "sha256:bbbe1148d27953a8",
+      "install_path": "mlops/research/dspy",
+      "files": [
+        "SKILL.md",
+        "references/examples.md",
+        "references/modules.md",
+        "references/optimizers.md"
+      ],
+      "metadata": {
+        "backfilled_from": "optional-skills"
+      },
+      "installed_at": "2026-11-06T00:11:28.173140+00:00",
+      "updated_at": "2026-11-06T00:11:28.173140+00:00"
+    }
+  }
+}

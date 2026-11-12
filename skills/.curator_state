@@ -1,9 +1,9 @@
 {
-  "last_report_path": "/home/wei/.hermes/logs/curator/20260714-231351",
-  "last_run_at": "2026-07-14T23:13:51.979815+00:00",
-  "last_run_duration_seconds": 169.858676,
-  "last_run_summary": "auto: no changes; llm: Both skills are confirmed removed from the active index. The consolidation is complete. Here's the summary.\n\n---\n\n## Curator Summary\n\n### Cluster Processed: Crypto Meme/Chain Analysis\n\nThe dominant cluster in the 16-agent-created-skills was…\narchived 2 skill(s):\n  • cross-chain-meme-kol-analysis → gmgn-onchain-analysis\n  • crypto-meme-analysis → gmgn-onchain-analysis\nfull report: hermes curator status\nkeep an umbrella stable: hermes curator pin gmgn-onchain-analysis",
-  "last_run_summary_shown_at": null,
+  "last_report_path": "/home/wei/.hermes/logs/curator/20261112-021649",
+  "last_run_at": "2026-11-12T02:16:49.782075+00:00",
+  "last_run_duration_seconds": 18.947786,
+  "last_run_summary": "auto: 12 marked stale, 5 archived; llm: skipped (consolidation off)",
+  "last_run_summary_shown_at": "2026-11-04T15:37:55.850532+00:00",
   "paused": false,
-  "run_count": 3
+  "run_count": 13
 }

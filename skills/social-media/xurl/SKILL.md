@@ -394,6 +394,7 @@ xurl --app staging /2/users/me             # one-off against staging
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | Auth errors after successful OAuth flow | Token saved to `default` app (no client-id/secret) instead of your named app | `xurl auth oauth2 --app my-app` then `xurl auth default my-app` |
+| No xurl auth set up, need to read a tweet anyway | xurl requires OAuth 2.0 credentials | Use the vxtwitter public API — no auth needed for read-only. See `references/tweet-reading-without-auth.md`. |
 | `unauthorized_client` during OAuth | App type set to "Native App" in X dashboard | Change to "Web app, automated app or bot" in User Authentication Settings |
 | `UsernameNotFound` or 403 on `/2/users/me` right after OAuth | X not returning username reliably from `/2/users/me` | Re-run `xurl auth oauth2 --app my-app YOUR_USERNAME` (xurl v1.1.0+) to pass the handle explicitly |
 | 401 on every request | Token expired or wrong default app | Check `xurl auth status` — verify `▸` points to an app with oauth2 tokens |
